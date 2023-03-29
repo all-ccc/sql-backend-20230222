@@ -132,7 +132,162 @@ FROM Custom AS C;
 -- 중복 제거 (DISTINCT)
 SELECT DISTINCT name FROM Custom;
 
+-- 연산자
+-- 비교연산
 
+-- BETWEEN a AND b
+-- a보다 크거나 같으면서 b보다 작거나 같으면 true를 반환
+SELECT * FROM Custom
+WHERE age BETWEEN 10 AND 20;
 
+-- IN()
+-- 인수로 전달된 값과 동일한 값이 하나라도 존재한다면 true를 반환
+SELECT * FROM Custom
+WHERE name IN ('John Doe', 'Michle', 'James');
 
+-- SELECT * FROM Custom
+-- WHERE name = 'John Doe' 
+-- OR name = 'Michle' 
+-- OR name = 'James';
+
+-- IS
+-- 비교대상이 Boolean 형태일 때 사용하는 비교 연산자
+SELECT * FROM Custom
+WHERE accept_marketing IS true;
+
+-- IS NULL
+-- 비교대상이 Null이면 true를 반환
+SELECT * FROM Custom
+WHERE email IS NULL;
+
+-- LIKE
+-- 문자열의 패턴을 비교하여 동일한 패턴을 가지고 있는 문자열이면 true를 반환
+
+-- 와일드 카드
+-- % : 0개 이상의 패턴
+-- _ : 1개의 패턴 (정확한 패턴 찾을 시 사용)
+SELECT * FROM Custom
+WHERE email LIKE '%gmail%';
+
+-- Constraint (제약조건)
+-- RDBMS에서 삽입, 수정, 삭제에 대해서 무결성을 보장해주는 조건
+
+-- NOT NULL
+-- 입력 혹은 수정 작업에 있어서 해당 필드에 Null이 올 수 없도록 하는 제약조건
+
+-- Create
+CREATE TABLE NotnullTable1 (
+	notnull_field INT NOT NULL
+);
+
+-- Alter
+-- Alter로 NOT NULL 제약 조건을 추가할 때는
+-- 원래 존재하는 레코드에서 해당 필드의 데이터가 Null이 존재하면 안됨
+CREATE TABLE NotnullTable2 (
+	notnull_field INT
+);
+
+ALTER TABLE NotnullTable2
+MODIFY COLUMN notnull_field INT NOT NULL;
+
+-- Default
+-- 입력 작업에서 해당 필드의 값이 들어오지 않으면 기본값으로 지정해주는 제약조건
+
+-- CREATE
+CREATE TABLE defaultTable1 (
+	default_field INT DEFAULT 1
+);
+
+-- ALTER
+CREATE TABLE defaultTable2 (
+	default_field INT
+);
+
+ALTER TABLE defaultTable2
+MODIFY COLUMN default_field INT DEFAULT 1;  -- 원래 null이었던 애들은 1로 바뀌지 않음. 이 이후로 생성되는 애들만
+
+-- UNIQUE
+-- 삽입, 수정 작업에서 해당 제약조건이 걸려있는 필드의 데이터에 대해 중복을 허용하지 않는 제약조건
+
+-- CREATE (방법 2개)
+CREATE TABLE Unique_Table1 (
+	unique_field INT UNIQUE
+);
+
+CREATE TABLE Unique_Table2 (
+	unique_field INT,
+    CONSTRAINT unique_key_1 UNIQUE (unique_field)
+);
+
+-- ALTER (방법 2개)
+CREATE TABLE Unique_Table3 (
+	unique_field INT
+);
+ALTER TABLE Unique_Table3 MODIFY unique_field INT UNIQUE;
+
+CREATE TABLE Unique_Table4 (
+	unique_field INT
+);
+ALTER TABLE Unique_Table4
+ADD CONSTRAINT unique_key_1 UNIQUE (unique_field);
+-- 추가할 때는 원래 있는 레코드의 무결성을 확인해줘야 함
+
+-- PRIMARY KEY
+-- 기본키에 대한 제약 조건, NOT NULL / UNIQUE 가 포함되어 있음
+-- 삽입, 수정 시에 NULL을 포함할 수 없음, 중복된 데이터를 포함할 수 없음
+
+-- CREATE (방법 2개)
+CREATE TABLE primary_table1 (
+	primary_field INT PRIMARY KEY
+);
+
+CREATE TABLE primary_table2 (
+	primary_field INT,
+    CONSTRAINT primary_key_1
+    PRIMARY KEY (primary_field)
+);
+
+-- ALTER (방법 2개)
+CREATE TABLE primary_table3 (
+	primary_field INT
+);
+ALTER TABLE primary_table3
+MODIFY COLUMN primary_field INT PRIMARY KEY;
+
+CREATE TABLE primary_table4 (
+	primary_field INT
+);
+ALTER TABLE primary_table4
+ADD CONSTRAINT primary_key_1 PRIMARY KEY (primary_field);
+
+-- FOREIGN KEY
+-- 참조 제약조건, 해당 테이블을 해당 필드를 기준으로 외부 테이블의 외부 필드를 참조하도록 하는 제약조건
+-- 해당 제약조건이 걸려있는 필드의 경우 참조하는 테이블의 참조 필드에
+-- 존재하는 데이터만 삽입할 수 있음
+
+-- CREATE
+CREATE TABLE Referenced_Table (
+	primary_key INT PRIMARY KEY
+);
+
+-- CREATE 시에 참조 제약조건을 추가할 때는
+-- 선행적으로 참조할 테이블과 필드가 존재해야 하고
+-- 참조할 필드가 PRIMARY KEY 혹은 UNIQUE 제약조건이 지정되어 있어야 함
+-- 참조 제약조건이 걸리는 필드는 참조할 필드의 데이터 타입과 일치해야 함
+CREATE TABLE Foreign_Table1 (
+	foreign_field INT,
+    CONSTRAINT foreign_key_1 -- 이름이니까 아무거나 지으면 됨
+    FOREIGN KEY (foreign_field)
+    REFERENCES Referenced_Table (primary_key)
+);
+
+-- ALTER
+CREATE TABLE Foreign_Table2 (
+	foreign_field INT
+);
+
+ALTER TABLE Foreign_Table2
+ADD CONSTRAINT foreign_key_1
+FOREIGN KEY (foreign_field)
+REFERENCES Referenced_Table (primary_key);
 
